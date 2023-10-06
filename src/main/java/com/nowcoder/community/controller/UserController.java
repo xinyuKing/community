@@ -27,13 +27,13 @@ import java.io.IOException;
 public class UserController {
     private static final Logger logger= LoggerFactory.getLogger(UserController.class);
 
-    @Value("community.path.upload")
+    @Value("${community.path.upload}")
     private String uploadPath;
 
-    @Value("community.path.domain")
+    @Value("${community.path.domain}")
     private String domian;
 
-    @Value("server.servlet.context-path")
+    @Value("${server.servlet.context-path}")
     private String contextPath;
 
     @Autowired
@@ -63,6 +63,7 @@ public class UserController {
 
         //生成随机文件名(感觉优点不对劲)
         filename=CommunityUtil.generateUUID()+suffix;
+        System.out.println(uploadPath);
         //确定文件存放路径
         File dest = new File(uploadPath+"/"+filename);
         try {
