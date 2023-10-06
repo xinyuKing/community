@@ -43,6 +43,7 @@ public class UserService implements CommunityConstant {
         return userMapper.selectById(id);
     }
 
+    /*注册*/
     public Map<String,Object> register(User user){
         Map<String,Object> map=new HashMap<>();
 
@@ -71,17 +72,31 @@ public class UserService implements CommunityConstant {
         }
 
         //验证邮箱
+        //判断条件：可以通过邮箱查到用户
         u = userMapper.selectByEmail(user.getEmail());
         if(u!=null){
             map.put("emailMsg","邮箱已被注册！");
             return map;
         }
+        //验证邮箱
+        //判断条件：可以通过邮箱查到激活的用户(自己的)
+//        u = userMapper.selectByEmail(user.getEmail());
+//        if(u!=null){
+//            if(u.getStatus()==1){
+//                map.put("emailMsg","邮箱已被注册！");
+//                return map;
+//            }else {//否则删除用户未激活的用户
+//                userMapper.deleteById(u.getId());
+//            }
+//        }
 
         // 注册用户
         // 对密码进行加密
         user.setSalt(CommunityUtil.generateUUID().substring(0,5));
         user.setPassword(CommunityUtil.md5(user.getPassword()+user.getSalt()));
+        //设置为普通用户
         user.setType(0);
+        //用户未激活
         user.setStatus(0);
         // 随机生成注册码
         user.setActivationCode(CommunityUtil.generateUUID().substring(0,6));
@@ -91,7 +106,8 @@ public class UserService implements CommunityConstant {
         // 插入用户
         userMapper.insertUser(user);
 
-        //激活用户
+        //用户激活
+        //给用户发送激活邮件,用户通过前往邮件发送的网址进行激活
         Context context=new Context();
         context.setVariable("email",user.getEmail());
         //http://localhost:8080/community/activation/101/code
@@ -105,6 +121,7 @@ public class UserService implements CommunityConstant {
         return map;
     }
 
+    /*激活*/
     public int activation(int userId,String code){
         User user = userMapper.selectById(userId);
         if(user.getStatus()==1){
@@ -118,8 +135,8 @@ public class UserService implements CommunityConstant {
         }
     }
 
+    /*登录*/
     public Map<String,Object> login(String username,String password,int expiredSeconds){
-        System.out.println("test01");
         Map<String,Object> map=new HashMap<>();
 
         //空值处理
@@ -164,11 +181,18 @@ public class UserService implements CommunityConstant {
         return map;
     }
 
+    /*退出*/
     public void logout(String ticket){
         loginTicketMapper.updateStatus(ticket,1);
     }
 
+    /*查询登录凭证*/
     public LoginTicket findLoginTicket(String ticket){
         return loginTicketMapper.selectByTicket(ticket);
+    }
+
+    /*更新用户头像路径*/
+    public int updateHeader(int userId,String headerUrl){
+        return userMapper.updateHeader(userId,headerUrl);
     }
 }

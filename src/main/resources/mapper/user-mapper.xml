@@ -44,4 +44,8 @@
     <update id="updatePassword">
         update user set password=#{password} where id=#{id}
     </update>
+
+    <delete id="deleteById">
+        delete from user where id=#{id} and status=0
+    </delete>
 </mapper>

@@ -22,18 +22,19 @@ public class MailClient {
     private String from;
 
     public void sendMail(String to,String subject,String content){
-//        MimeMessage message = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
+            // 创建MimeMessage
             MimeMessage message = mailSender.createMimeMessage();
+            // 使用MimeMessageHelper设置邮件属性和内容
             MimeMessageHelper helper = new MimeMessageHelper(message);
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(content,true);
+            //发送邮件
             mailSender.send(helper.getMimeMessage());
         } catch (MessagingException e) {
-            logger.error("发送日志失败："+e.getMessage());
+            logger.error("发送邮件失败："+e.getMessage());
         }
     }
 }

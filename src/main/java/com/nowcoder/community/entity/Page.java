@@ -8,7 +8,8 @@ public class Page {
     private int current=1;
     //显示的上线
     private int limit=10;
-    //数据的总数（用于计算总的页数）
+    //数据的总行
+    // 数（用于计算总的页数）
     private int rows;
     //查询路径(用于复用分页的链接)
     private String path;
