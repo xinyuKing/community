@@ -43,4 +43,9 @@ public class DiscussPostService {
         //插入数据
         return discussPostMapper.insertDiscussPostRows(discussPost);
     }
+
+    //通过id寻找帖子
+    public DiscussPost findDiscussPostById(int id){
+        return discussPostMapper.selectDiscussPostById(id);
+    }
 }
