@@ -57,3 +57,7 @@ post（enctype="multipart/form-data"，接收用MultipartFile headerImage）提�
 编写拦截器实现拦截未登录的用户访问带有该注解的controller层方法
 
 ## 过滤敏感词（为评论功能做准备）
+
+创建前缀树的内部生成类，读取敏感词的txt文档，生成前缀树对象，通过生成的前缀树过滤敏感词
+
+## 发布帖子
