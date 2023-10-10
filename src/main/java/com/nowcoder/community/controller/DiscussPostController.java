@@ -69,7 +69,7 @@ public class DiscussPostController implements CommunityConstant {
         //评论：给帖子的评论
         //回复：给评论的评论
         //评论的列表
-        List<Comment> comments = commentService.findCommentsByEntity(ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
+        List<Comment> comments = commentService.findCommentsByEntity(ENTITY_TYPE_COMMENT, post.getId(), page.getOffset(), page.getLimit());
         //评论的Vo列表
         List<Map<String,Object>> commentVoList=new ArrayList<>();
         if(comments!=null){
@@ -82,7 +82,7 @@ public class DiscussPostController implements CommunityConstant {
                 commentVo.put("user",user1);
 
                 //回复列表
-                List<Comment> replys = commentService.findCommentsByEntity(ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE);
+                List<Comment> replys = commentService.findCommentsByEntity(ENTITY_TYPE_REPLY, comment.getId(), 0, Integer.MAX_VALUE);
                 //回复的Vo列表
                 List<Map<String,Object>> replyVoList=new ArrayList<>();
                 if(replys!=null){
@@ -104,7 +104,7 @@ public class DiscussPostController implements CommunityConstant {
                 commentVo.put("replys",replyVoList);
 
                 //回复数量
-                int replyCount = commentService.findCountByEntity(ENTITY_TYPE_COMMENT, comment.getId());
+                int replyCount = commentService.findCountByEntity(ENTITY_TYPE_REPLY, comment.getId());
                 commentVo.put("replyCount",replyCount);
 
                 commentVoList.add(commentVo);
