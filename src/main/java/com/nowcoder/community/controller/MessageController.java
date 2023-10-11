@@ -82,10 +82,6 @@ public class MessageController {
                     ids.add(message.getId());
                 }
             }
-            //test
-            for (Integer id : ids) {
-                System.out.println(id);
-            }
         }
 
         model.addAttribute("letters",letters);
@@ -94,9 +90,8 @@ public class MessageController {
         model.addAttribute("target",getLetterTarget(conversationId));
 
         //改变已读的消息为已读
-        if(ids.size()!=0){
+        if(!ids.isEmpty()){
             messageService.readMessage(ids);
-            System.out.println("tet_____________________________");
         }
 
         return "/site/letter-detail";
