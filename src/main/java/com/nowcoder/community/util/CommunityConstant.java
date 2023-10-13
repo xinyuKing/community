@@ -38,6 +38,11 @@ public interface CommunityConstant {
     int ENTITY_TYPE_REPLY=2;
 
     /*
+     * 实体类型：用户
+     * */
+    int ENTITY_TYPE_USER=3;
+
+    /*
      * 实体类型：给帖子点赞(为了更好的理解原项目而增加的变量)
      * */
     int LIKE_TYPE_POST=1;
