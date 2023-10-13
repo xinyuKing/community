@@ -36,4 +36,14 @@ public interface CommunityConstant {
      * 实体类型：评论（回复）
      * */
     int ENTITY_TYPE_REPLY=2;
+
+    /*
+     * 实体类型：给帖子点赞(为了更好的理解原项目而增加的变量)
+     * */
+    int LIKE_TYPE_POST=1;
+
+    /*
+     * 实体类型：给回帖和回复点赞(为了更好的理解原项目而增加的变量)
+     * */
+    int LIKE_TYPE_COMMENT=2;
 }
