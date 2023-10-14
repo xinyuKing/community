@@ -7,9 +7,11 @@ import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.MailClient;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -18,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService implements CommunityConstant {
@@ -36,11 +39,22 @@ public class UserService implements CommunityConstant {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
+    //优化后存在redis中
+/*    @Autowired
+    private LoginTicketMapper loginTicketMapper;*/
+
     @Autowired
-    private LoginTicketMapper loginTicketMapper;
+    private RedisTemplate redisTemplate;
 
     public User findUserById(int id){
-        return userMapper.selectById(id);
+        //优化后先从redis中查询
+//        return userMapper.selectById(id);
+        User user = getCache(id);
+        if(user!=null){
+            return user;
+        }else {
+            return initCache(id);
+        }
     }
 
     /*注册*/
@@ -123,12 +137,16 @@ public class UserService implements CommunityConstant {
 
     /*激活*/
     public int activation(int userId,String code){
-        User user = userMapper.selectById(userId);
+        //这一步调用该类中优化后的方法findUserById和直接读那个更好一些???????
+        User user = findUserById(userId);
+//        User user = userMapper.selectById(userId);
         if(user.getStatus()==1){
             return ACTIVATION_REPEAT;
         }else if(user.getActivationCode().equals(code)){
             // 把用户状态改为1
             userMapper.updateStatus(userId,1);
+            //清除redis中的该用户
+            clearCache(userId);
             return ACTIVATION_SUCCESS;
         }else{
             return ACTIVATION_FAILURE;
@@ -173,8 +191,13 @@ public class UserService implements CommunityConstant {
         loginTicket.setTicket(CommunityUtil.generateUUID());
         loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis()+1000*expiredSeconds));
-        //插入登录凭证
-        loginTicketMapper.insertLoginTicket(loginTicket);
+        //插入登录凭证，优化后存在redis中
+//        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        String ticketKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        //redis会自动把对象序列化成json字符串
+        //别忘记设置存活时间
+        redisTemplate.opsForValue().set(ticketKey,loginTicket,expiredSeconds,TimeUnit.SECONDS);
 
         map.put("ticket",loginTicket.getTicket());
 
@@ -183,21 +206,55 @@ public class UserService implements CommunityConstant {
 
     /*退出*/
     public void logout(String ticket){
-        loginTicketMapper.updateStatus(ticket,1);
+        //已经把登录凭证存入Redis中
+//        loginTicketMapper.updateStatus(ticket,1);
+        //从redis中读出登录凭证，修改状态后再存入
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket=(LoginTicket)redisTemplate.opsForValue().get(ticketKey);
+        loginTicket.setStatus(1);//修改登录状态
+        redisTemplate.opsForValue().set(ticketKey,loginTicket);
     }
 
     /*查询登录凭证*/
     public LoginTicket findLoginTicket(String ticket){
-        return loginTicketMapper.selectByTicket(ticket);
+//        return loginTicketMapper.selectByTicket(ticket);
+        //优化后把登录凭证存入了Redis中
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        return (LoginTicket)redisTemplate.opsForValue().get(ticketKey);
     }
 
     /*更新用户头像路径*/
     public int updateHeader(int userId,String headerUrl){
-        return userMapper.updateHeader(userId,headerUrl);
+//        return userMapper.updateHeader(userId,headerUrl);
+        int rows = userMapper.updateHeader(userId, headerUrl);
+        clearCache(userId);
+        return rows;
     }
 
     /*通过用户姓名寻找用户*/
     public User findUserByName(String username){
         return userMapper.selectByName(username);
+    }
+
+    //优先从缓存中取值
+    public User getCache(int userId){
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        return (User) redisTemplate.opsForValue().get(userKey);
+    }
+
+    //取不到时初始化缓存数据
+    public User initCache(int userId){
+        //从数据表中读取user
+        User user = userMapper.selectById(userId);
+        //把user存入redis中
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.opsForValue().set(userKey,user,3600, TimeUnit.SECONDS);
+        return user;
+    }
+
+    //数据变更时清除缓存数据
+    public void clearCache(int userId){
+        String userKey = RedisKeyUtil.getUserKey(userId);
+        redisTemplate.delete(userKey);
     }
 }
