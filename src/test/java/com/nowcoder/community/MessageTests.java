@@ -2,6 +2,7 @@ package com.nowcoder.community;
 
 import com.nowcoder.community.dao.MessageMapper;
 import com.nowcoder.community.entity.Message;
+import com.nowcoder.community.service.MessageService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ import java.util.List;
 public class MessageTests {
     @Autowired
     private MessageMapper messageMapper;
+
+    @Autowired
+    private MessageService messageService;
 
     @Test
     public void testSelectConversation(){
@@ -52,5 +56,21 @@ public class MessageTests {
         System.out.println(unreadCount);
     }
 
+    @Test
+    public void testFindLatestNotice(){
+        Message message = messageService.findLatestNotice(111, "like");
+        System.out.println(message);
+    }
 
+    @Test
+    public void testFindNoticeCount(){
+        int count = messageService.findNoticeCount(111, "like");
+        System.out.println(count);
+    }
+
+    @Test
+    public void testFindNoticeUnreadCount(){
+        int count = messageService.findNoticeUnreadCount(111, "like");
+        System.out.println(count);
+    }
 }

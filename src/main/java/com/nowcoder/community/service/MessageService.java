@@ -38,6 +38,7 @@ public class MessageService {
         return messageMapper.selectLetterUnreadCount(userId, conversationId);
     }
 
+    //增加消息
     public int addMessage(Message message){
         //防止html标签转义
         message.setContent(HtmlUtils.htmlEscape(message.getContent()));
@@ -49,5 +50,20 @@ public class MessageService {
     //把消息改变为已读
     public int readMessage(List<Integer> ids){
         return messageMapper.updateStatus(ids, 1);
+    }
+
+    ////查询某个主题下最新的通知
+    public Message findLatestNotice(int userId,String topic){
+        return messageMapper.selectLatestNotice(userId, topic);
+    }
+
+    //查询某个主题包含的通知数量
+    public int findNoticeCount(int userId,String topic){
+        return messageMapper.selectNoticeCount(userId, topic);
+    }
+
+    //查询某个主题未读的通知数量
+    public int findNoticeUnreadCount(int userId,String topic){
+        return messageMapper.selectNoticeUnreadCount(userId, topic);
     }
 }
