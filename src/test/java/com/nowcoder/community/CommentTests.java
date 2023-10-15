@@ -36,4 +36,10 @@ public class CommentTests {
             System.out.println(comment);
         }
     }
+
+    @Test
+    public void testFindCommentById(){
+        Comment comment = commentService.findCommentById(2);
+        System.out.println(comment);
+    }
 }

@@ -51,4 +51,24 @@ public interface CommunityConstant {
      * 实体类型：给回帖和回复点赞(为了更好的理解原项目而增加的变量)
      * */
     int LIKE_TYPE_COMMENT=2;
+
+    /*
+    * 主题：评论
+    * */
+    String TOPIC_COMMENT="comment";
+
+    /*
+     * 主题：点赞
+     * */
+    String TOPIC_LIKE="like";
+
+    /*
+     * 主题：关注
+     * */
+    String TOPIC_FOLLOW="follow";
+
+    /*
+    * 系统用户ID
+    * */
+    int SYSTEM_USER_ID=1;
 }

@@ -7,7 +7,7 @@ public class Comment {
     private int userId;
     private int entityType;
     private int entityId;
-    private int targetId;
+    private int targetId;//目标用户id
     private String content;
     private int status;
     private Date createTime;
