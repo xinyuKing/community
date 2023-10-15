@@ -221,8 +221,47 @@ public class MessageController implements CommunityConstant {
         return "/site/notice";
     }
 
-    @RequestMapping(path = "/notice/detail",method = RequestMethod.GET)
-    public String getNoticeDetail(Model model,Page page){
+    @RequestMapping(path = "/notice/detail/{topic}",method = RequestMethod.GET)
+    public String getNoticeDetail(Model model,Page page,@PathVariable(name = "topic")String topic){
+        User user = hostHolder.getUser();
+        //设置分页信息
+        page.setLimit(5);
+        page.setRows(messageService.findNoticeCount(user.getId(),topic));
+        page.setPath("/notice/detail/"+topic);
+
+        List<Message> noticeList = messageService.findNotices(user.getId(), topic, page.getOffset(), page.getLimit());
+        List<Map<String,Object>> noticeVoList=new ArrayList<>();
+        List<Integer> ids=new ArrayList<>();
+        if(noticeList!=null){
+            for (Message notice : noticeList) {
+                Map<String,Object> noticeVo=new HashMap<>();
+                //通知
+                noticeVo.put("notice",notice);
+
+                //内容
+                String content = HtmlUtils.htmlUnescape(notice.getContent());
+                Map<String,Object> data = JSONObject.parseObject(content, HashMap.class);
+                noticeVo.put("user",userService.findUserById((Integer)data.get("userId")));
+                noticeVo.put("entityType",data.get("entityType"));
+                noticeVo.put("entityId",data.get("entityId"));
+                noticeVo.put("postId",data.get("postId"));
+
+                //通知作者
+                noticeVo.put("fromUser",userService.findUserById(notice.getFromId()));//这里查询出来的数据是系统用户
+                noticeVoList.add(noticeVo);
+
+                //把未读的消息id加入到ids
+                if(notice.getStatus()==0&&notice.getToId()==hostHolder.getUser().getId()){
+                    ids.add(notice.getId());
+                }
+            }
+        }
+        model.addAttribute("notices",noticeVoList);
+
+        //设置已读
+        if(!ids.isEmpty()){
+            messageService.readMessage(ids);
+        }
 
         return "/site/notice-detail";
     }

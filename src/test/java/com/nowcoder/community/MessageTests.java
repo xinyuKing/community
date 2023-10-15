@@ -73,4 +73,12 @@ public class MessageTests {
         int count = messageService.findNoticeUnreadCount(111, "like");
         System.out.println(count);
     }
+
+    @Test
+    public void testSelectNotices(){
+        List<Message> notices = messageMapper.selectNotices(111, "comment",0,5);
+        for (Message notice : notices) {
+            System.out.println(notice);
+        }
+    }
 }
