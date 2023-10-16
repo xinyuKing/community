@@ -53,8 +53,16 @@ public class CommentController implements CommunityConstant {
             Comment target = commentService.findCommentById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
         }
-
         eventProducer.fireEvent(event);
+        //修改ES中帖子的回帖数量
+        if(comment.getEntityType()==ENTITY_TYPE_COMMENT){
+            event = new Event();
+            event.setTopic(TOPIC_PUBLISH);
+            //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
+            event.setEntityType(ENTITY_TYPE_COMMENT);
+            event.setEntityId(discussPostId);
+            event.setUserId(hostHolder.getUser().getId());
+        }
 
         return "redirect:/discuss/detail/"+discussPostId;
     }
