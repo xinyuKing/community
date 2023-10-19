@@ -5,10 +5,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.core.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -133,5 +132,106 @@ public class RedisTests {
             }
         });
         System.out.println(obj);
+    }
+
+    /*统计20万个重复数据的独立总数*/
+    @Test
+    public void testHyperLogLog(){
+        String redisKey="test:hll:02";
+        for (int i = 0; i < 100000; i++) {
+            redisTemplate.opsForHyperLogLog().add(redisKey,i);
+        }
+
+        for (int i = 0; i < 100000; i++) {
+            redisTemplate.opsForHyperLogLog().add(redisKey,(int)(Math.random()*100000+1));
+        }
+
+        Long size = redisTemplate.opsForHyperLogLog().size(redisKey);
+        System.out.println(size);
+    }
+
+    /*将三组数据合并，再统计合并后的重复数据的独立总数*/
+    @Test
+    public void testHyperLogLogUnion(){
+        String redisKey03="test:hll:03";
+        for (int i = 0; i < 10000; i++) {
+            redisTemplate.opsForHyperLogLog().add(redisKey03,i);
+        }
+
+        String redisKey04="test:hll:04";
+        for (int i = 5000; i < 15000; i++) {
+            redisTemplate.opsForHyperLogLog().add(redisKey04,i);
+        }
+
+        String redisKey05="test:hll:05";
+        for (int i = 10000; i < 20000; i++) {
+            redisTemplate.opsForHyperLogLog().add(redisKey05,i);
+        }
+
+        String unionKey="test:hll:union";
+
+        redisTemplate.opsForHyperLogLog().union(unionKey,redisKey03,redisKey04,redisKey05);
+
+        Long size = redisTemplate.opsForHyperLogLog().size(unionKey);
+        System.out.println(size);
+    }
+
+    /*统计一组数据的布尔值*/
+    @Test
+    public void testBitMap(){
+        String redisKey="test:bm:01";
+
+        //记录
+        redisTemplate.opsForValue().setBit(redisKey,1,true);
+        redisTemplate.opsForValue().setBit(redisKey,4,true);
+        redisTemplate.opsForValue().setBit(redisKey,7,true);
+
+        //查询
+        System.out.println(redisTemplate.opsForValue().getBit(redisKey,1));
+        System.out.println(redisTemplate.opsForValue().getBit(redisKey,2));
+        System.out.println(redisTemplate.opsForValue().getBit(redisKey,3));
+
+        //统计
+        Object obj = redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                return redisConnection.bitCount(redisKey.getBytes());
+            }
+        });
+        System.out.println(obj);
+    }
+
+    /*统计三组数据的布尔值，并对这三组数据做OR运算*/
+    @Test
+    public void testBitMapOperate(){
+        String redisKey02="test:bm:02";
+        redisTemplate.opsForValue().setBit(redisKey02,0,true);
+        redisTemplate.opsForValue().setBit(redisKey02,1,true);
+        redisTemplate.opsForValue().setBit(redisKey02,2,true);
+
+        String redisKey03="test:bm:03";
+        redisTemplate.opsForValue().setBit(redisKey03,3,true);
+        redisTemplate.opsForValue().setBit(redisKey03,4,true);
+        redisTemplate.opsForValue().setBit(redisKey03,2,true);
+
+        String redisKey04="test:bm:04";
+        redisTemplate.opsForValue().setBit(redisKey04,4,true);
+        redisTemplate.opsForValue().setBit(redisKey04,5,true);
+        redisTemplate.opsForValue().setBit(redisKey04,6,true);
+
+        String redisKey="test:bm:or";
+        Object obj = redisTemplate.execute(new RedisCallback() {
+            @Override
+            public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                redisConnection.bitOp(RedisStringCommands.BitOperation.OR, redisKey.getBytes(), redisKey02.getBytes(), redisKey03.getBytes(), redisKey04.getBytes());
+                return redisConnection.bitCount(redisKey.getBytes());
+            }
+        });
+
+        System.out.println(obj);
+
+        for (int i = 0; i < 7; i++) {
+            System.out.println(redisTemplate.opsForValue().getBit(redisKey,i));
+        }
     }
 }
