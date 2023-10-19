@@ -52,13 +52,15 @@ public class UserController implements CommunityConstant {
     @Autowired
     private FollowService followService;
 
-    @LoginRequired
+//    优化后自定义的LoginRequired拦截器被弃用
+//    @LoginRequired
     @RequestMapping(path = "/setting",method = RequestMethod.GET)
     public String getSettingPage(){
         return "/site/setting";
     }
 
-    @LoginRequired
+    //    优化后自定义的LoginRequired拦截器被弃用
+//    @LoginRequired
     @RequestMapping(path = "/upload",method = RequestMethod.POST)
     public String upload(MultipartFile headerImage, Model model){
         if(headerImage==null){
@@ -118,7 +120,8 @@ public class UserController implements CommunityConstant {
     }
 
     //个人主页
-    @LoginRequired
+    //    优化后自定义的LoginRequired拦截器被弃用
+//    @LoginRequired
     @RequestMapping(path = "/profile/{userId}",method = RequestMethod.GET)
     public String getProfilePage(Model model,@PathVariable(name = "userId")int userId){
         //查询用户
