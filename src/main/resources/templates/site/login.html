@@ -92,7 +92,7 @@
 							<input type="text" th:class="|form-control ${codeMsg!=null?'is-invalid':''}|"
 
 								   name="code" id="verifycode" placeholder="请输入验证码!">
-							<div class="invalid-feedback" th:text="codeMsg">
+							<div class="invalid-feedback" th:text="${codeMsg}">
 								验证码不正确!
 							</div>
 						</div>
