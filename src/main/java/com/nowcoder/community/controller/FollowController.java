@@ -11,6 +11,7 @@ import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +35,9 @@ public class FollowController implements CommunityConstant {
 
     @Autowired
     private EventProducer eventProducer;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @LoginRequired
     @RequestMapping(path = "/follow",method = RequestMethod.POST)

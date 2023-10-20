@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface DiscussPostMapper {
-    List<DiscussPost> selectDiscussPosts(int userId,int offset,int limit);
+    List<DiscussPost> selectDiscussPosts(int userId,int offset,int limit,int orderMode);
 
     //用于给参数起别名
     //如果方法只有一个参数，并且在<if>中使用，就必须加别名
@@ -28,4 +28,7 @@ public interface DiscussPostMapper {
 
     // 更新帖子的精华状态
     int updateStatus(int id,int status);
+
+    // 更新帖子分数
+    int updateScore(int id,double score);
 }
