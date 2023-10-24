@@ -77,7 +77,7 @@ public class PostScoreRefreshJob implements Job, CommunityConstant {
         //评论数量
         int commentCount = post.getCommentCount();
         //点赞的数量
-        long entityLikeCount = likeService.findEntityLikeCount(ENTITY_TYPE_COMMENT, postId);
+        long entityLikeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, postId);
 
         //计算权重
         double w=(wonderful?75:0)+commentCount*10+entityLikeCount*2;

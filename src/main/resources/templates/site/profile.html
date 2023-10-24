@@ -83,7 +83,12 @@
 							<span th:utext="${user.username}">nowcoder</span>
 							<!--input用于下面的按钮获取用户id-->
 							<input type="hidden" id="entityId" th:value="${user.id}">
-							<button type="button" th:class="|btn ${hasFollowed?'btn-secondary':'btn-info'} btn-sm float-right mr-5 follow-btn|" th:text="${hasFollowed?'已关注':'关注TA'}" th:if="${loginUser!=null&&loginUser.id!=user.id}">关注TA</button>
+							<button type="button"
+									th:class="|btn ${hasFollowed?'btn-secondary':'btn-info'} btn-sm float-right mr-5 follow-btn|"
+									th:text="${hasFollowed?'已关注':'关注TA'}"
+									th:if="${loginUser!=null&&loginUser.id!=user.id}">
+								关注TA
+							</button>
 						</h5>
 						<div class="text-muted mt-3">
 							<span>注册于 <i class="text-muted" th:text="${#dates.format(user.createTime,'yyyy-MM-dd HH:mm:ss')}">2015-06-12 15:20:12</i></span>

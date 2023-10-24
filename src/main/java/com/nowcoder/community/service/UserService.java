@@ -136,7 +136,7 @@ public class UserService implements CommunityConstant {
     /*激活*/
     public int activation(int userId,String code){
         //这一步调用该类中优化后的方法findUserById和直接读那个更好一些???????
-        User user = findUserById(userId);
+        User user = this.findUserById(userId);
 //        User user = userMapper.selectById(userId);
         if(user.getStatus()==1){
             return ACTIVATION_REPEAT;

@@ -48,6 +48,7 @@ public class DiscussPostController implements CommunityConstant {
     @RequestMapping(path = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title,String content){
+        // 在Security中已经进行了拦截，这里可以不验证
         User user = hostHolder.getUser();
         if(user==null){
             return CommunityUtil.getJSONString(403,"您还没有登录!");
@@ -64,11 +65,11 @@ public class DiscussPostController implements CommunityConstant {
                 .setTopic(TOPIC_PUBLISH)
                 .setUserId(user.getId())
                 //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
-                .setEntityType(ENTITY_TYPE_COMMENT)
+                .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(discussPost.getId());
         eventProducer.fireEvent(event);
 
-        //计算帖子分数
+        //用于计算帖子分数，记录需要刷新分数的帖子id
         String redisKey = RedisKeyUtil.getPostScoreKey();
         redisTemplate.opsForSet().add(redisKey,discussPost.getId());
 
@@ -92,7 +93,7 @@ public class DiscussPostController implements CommunityConstant {
         //评论：给帖子的评论
         //回复：给评论的评论
         //评论的列表
-        List<Comment> comments = commentService.findCommentsByEntity(ENTITY_TYPE_COMMENT, post.getId(), page.getOffset(), page.getLimit());
+        List<Comment> comments = commentService.findCommentsByEntity(ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
         //评论的Vo列表
         List<Map<String,Object>> commentVoList=new ArrayList<>();
         //点赞数量
@@ -119,7 +120,7 @@ public class DiscussPostController implements CommunityConstant {
                 commentVo.put("likeStatus",likeStatus);
 
                 //回复列表
-                List<Comment> replys = commentService.findCommentsByEntity(ENTITY_TYPE_REPLY, comment.getId(), 0, Integer.MAX_VALUE);
+                List<Comment> replys = commentService.findCommentsByEntity(ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE);
                 //回复的Vo列表
                 List<Map<String,Object>> replyVoList=new ArrayList<>();
                 if(replys!=null){
@@ -147,7 +148,7 @@ public class DiscussPostController implements CommunityConstant {
                 commentVo.put("replys",replyVoList);
 
                 //回复数量
-                int replyCount = commentService.findCountByEntity(ENTITY_TYPE_REPLY, comment.getId());
+                int replyCount = commentService.findCountByEntity(ENTITY_TYPE_COMMENT, comment.getId());
                 commentVo.put("replyCount",replyCount);
 
                 commentVoList.add(commentVo);
@@ -171,7 +172,7 @@ public class DiscussPostController implements CommunityConstant {
                 .setTopic(TOPIC_PUBLISH)
                 .setUserId(hostHolder.getUser().getId())
                 //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
-                .setEntityType(ENTITY_TYPE_COMMENT)
+                .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(id);
         eventProducer.fireEvent(event);
 
@@ -190,7 +191,7 @@ public class DiscussPostController implements CommunityConstant {
                 .setTopic(TOPIC_PUBLISH)
                 .setUserId(hostHolder.getUser().getId())
                 //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
-                .setEntityType(ENTITY_TYPE_COMMENT)
+                .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(id);
         eventProducer.fireEvent(event);
 
@@ -213,7 +214,7 @@ public class DiscussPostController implements CommunityConstant {
                 .setTopic(TOPIC_PUBLISH)
                 .setUserId(hostHolder.getUser().getId())
                 //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
-                .setEntityType(ENTITY_TYPE_COMMENT)
+                .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(id);
         eventProducer.fireEvent(event);
 

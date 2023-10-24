@@ -98,7 +98,7 @@ public class FollowController implements CommunityConstant {
         return "/site/followee";
     }
 
-    @LoginRequired
+//    @LoginRequired
     @RequestMapping(path = "/followers/{entityId}",method = RequestMethod.GET)
     public String follower(Model model, Page page, @PathVariable(name = "entityId")int entityId){
         User user = userService.findUserById(entityId);

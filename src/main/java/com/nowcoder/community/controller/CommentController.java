@@ -51,20 +51,20 @@ public class CommentController implements CommunityConstant {
         event.setUserId(hostHolder.getUser().getId());
         event.setData("postId",discussPostId);
 
-        if(comment.getEntityType()==ENTITY_TYPE_COMMENT){
+        if(comment.getEntityType()==ENTITY_TYPE_POST){
             DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
-        }else if(comment.getEntityType()==ENTITY_TYPE_REPLY){
+        }else if(comment.getEntityType()==ENTITY_TYPE_COMMENT){
             Comment target = commentService.findCommentById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());
         }
         eventProducer.fireEvent(event);
         //修改ES中帖子的回帖数量
-        if(comment.getEntityType()==ENTITY_TYPE_COMMENT){
+        if(comment.getEntityType()==ENTITY_TYPE_POST){
             event = new Event();
             event.setTopic(TOPIC_PUBLISH);
             //在这里ENTITY_TYPE_POST更好理解一些，前面ENTITY_TYPE_COMMENT更好理解一些，常量设置少了
-            event.setEntityType(ENTITY_TYPE_COMMENT);
+            event.setEntityType(ENTITY_TYPE_POST);
             event.setEntityId(discussPostId);
             event.setUserId(hostHolder.getUser().getId());
             //计算帖子分数

@@ -9,8 +9,6 @@ import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.HostHolder;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +40,7 @@ public class MessageController implements CommunityConstant {
         page.setPath("/letter/list");
         page.setRows(messageService.findConversationCount(user.getId()));
 
+        //查询每条回话最新的一条消息
         List<Message> conversationList = messageService.findConversations(user.getId(), page.getOffset(), page.getLimit());
         List<Map<String,Object>> conversations=new ArrayList<>();
         for (Message conversation : conversationList) {

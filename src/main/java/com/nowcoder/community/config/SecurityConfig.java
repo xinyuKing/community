@@ -40,7 +40,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                         "/notice/**",
                         "/like",
                         "/follow",
-                        "/unfollow"
+                        "/unfollow",
+                        "/profile/**",
+                        "/followees/**",
+                        "/followers/**"
                 ).
                 hasAnyAuthority(
                         AUTHORITY_USER,
@@ -56,7 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                 )
                 .antMatchers(
                         "/discuss/delete",
-                        "/data/**"
+                        "/data/**",
+                        "/actuator/**"
                 ).
                 hasAnyAuthority(
                         AUTHORITY_ADMIN
