@@ -137,4 +137,7 @@ public class DiscussPostService {
     public int updateScore(int id,double score){
         return discussPostMapper.updateScore(id,score);
     }
+
+    public List<DiscussPost> findDiscussPostByUserId(int userId,int offset,int limit){return discussPostMapper.selectDiscussPostByUserId(userId, offset, limit);}
+    public int findDiscussPostRowsByUserId(int userId){return discussPostMapper.selectDiscussPostRows(userId);}
 }

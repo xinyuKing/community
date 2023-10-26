@@ -2,6 +2,7 @@ package com.nowcoder.community;
 
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.util.CommunityUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,10 @@ public class UserTests {
     public void testFindUserByName(){
         User user = userService.findUserByName("aaa");
         System.out.println(user);
+    }
+
+    @Test
+    public void testUpdatePassword(){
+        userService.updatePassword(151, CommunityUtil.md5("123456"+"f8910"));
     }
 }

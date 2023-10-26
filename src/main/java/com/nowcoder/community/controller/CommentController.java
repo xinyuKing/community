@@ -1,22 +1,22 @@
 package com.nowcoder.community.controller;
 
-import com.nowcoder.community.entity.Comment;
-import com.nowcoder.community.entity.DiscussPost;
-import com.nowcoder.community.entity.Event;
+import com.nowcoder.community.entity.*;
 import com.nowcoder.community.event.EventProducer;
 import com.nowcoder.community.service.CommentService;
 import com.nowcoder.community.service.DiscussPostService;
+import com.nowcoder.community.service.UserService;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.HostHolder;
 import com.nowcoder.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.Date;
+import java.util.*;
 
 @Controller
 @RequestMapping("/comment")
@@ -34,7 +34,39 @@ public class CommentController implements CommunityConstant {
     private DiscussPostService discussPostService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private RedisTemplate redisTemplate;
+
+    @RequestMapping(path = "/myreply/{userId}",method = RequestMethod.GET)
+    public String myreply(@PathVariable(name = "userId")int userId, Page page, Model model){
+        int rows = commentService.findCommentRowsByUserId(userId);
+        //设置分页信息
+        page.setRows(rows);
+        page.setLimit(5);
+        page.setPath("/comment/myreply/"+userId);
+
+        User user = userService.findUserById(userId);
+        model.addAttribute("user",user);
+
+        List<Comment> commentsList = commentService.findCommentsByUserId(userId,page.getOffset(),page.getLimit());
+
+        List<Map<String,Object>> commentVoList=new ArrayList<>();
+        for (Comment comment : commentsList) {
+            Map<String,Object> commentVo=new HashMap<>();
+            commentVo.put("comment",comment);
+            //如果是回复，找到回复是在哪个回帖下
+            while (comment.getEntityType()==2){
+                comment=commentService.findCommentById(comment.getEntityId());
+            }
+            DiscussPost post = discussPostService.findDiscussPostById(comment.getEntityId());
+            commentVo.put("post",post);
+            commentVoList.add(commentVo);
+        }
+        model.addAttribute("comments",commentVoList);
+        return "/site/my-reply";
+    }
 
     @RequestMapping(path = "/add/{discussPostId}",method = RequestMethod.POST)
     public String addComment(@PathVariable(name = "discussPostId")int discussPostId, Comment comment){

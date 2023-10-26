@@ -70,4 +70,19 @@
          set score=#{score}
          where id=#{id}
     </update>
+
+    <select id="selectDiscussPostByUserId" resultType="DiscussPost">
+        select <include refid="selectFields"></include>
+         from discuss_post
+         where status!=2 and user_id=#{userId}
+         order by type desc,create_time desc
+         limit #{offset},#{limit}
+    </select>
+
+    <select id="selectDiscussPostRowsByUserId" resultType="int">
+        select count(id)
+         from discuss_post
+         where status!=2
+         and user_id=#{userId}
+    </select>
 </mapper>

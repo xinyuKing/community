@@ -31,4 +31,9 @@ public interface DiscussPostMapper {
 
     // 更新帖子分数
     int updateScore(int id,double score);
+
+    // 查询每个用户的所有帖子
+    List<DiscussPost> selectDiscussPostByUserId(int userId,int offset,int limit);
+
+    int selectDiscussPostRowsByUserId(int userId);
 }

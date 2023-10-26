@@ -67,6 +67,22 @@ public class UserController implements CommunityConstant {
     @Value("${qiniu.bucket.header.url}")
     private String headerBucketUrl;
 
+    @RequestMapping(path = "/setting/updatepassword",method = RequestMethod.POST)
+    @ResponseBody
+    public String updatePassword(String oldPassword,String newPassword){
+        if (oldPassword==null||newPassword==null){
+            return CommunityUtil.getJSONString(1,"提交数据不能为空");
+        }
+        User user = hostHolder.getUser();
+        if(!user.getPassword().equals(CommunityUtil.md5(oldPassword+user.getSalt()))){
+            return CommunityUtil.getJSONString(1,"原始密码错误");
+        }
+
+        userService.updatePassword(user.getId(),CommunityUtil.md5(newPassword+user.getSalt()));
+
+        return CommunityUtil.getJSONString(0);
+    }
+
 //    优化后自定义的LoginRequired拦截器被弃用
 //    @LoginRequired
     @RequestMapping(path = "/setting",method = RequestMethod.GET)

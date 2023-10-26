@@ -45,6 +45,31 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @RequestMapping(path = "/mypost/{userId}",method = RequestMethod.GET)
+    public String mypost(@PathVariable("userId")int userId,Page page,Model model){
+        //配置分页信息
+        int rows = discussPostService.findDiscussPostRowsByUserId(userId);
+        page.setRows(rows);
+        page.setPath("/discuss/mypost/"+userId);
+        page.setLimit(5);
+
+        model.addAttribute("rows",rows);
+        User user = userService.findUserById(userId);
+        model.addAttribute("user",user);
+        List<DiscussPost> posts = discussPostService.findDiscussPostByUserId(userId, page.getOffset(), page.getLimit());
+        List<Map<String,Object>> postVoList=new ArrayList<>();
+        for (DiscussPost post : posts) {
+            Map<String,Object> postVo=new HashMap<>();
+            postVo.put("post",post);
+            //点赞数量
+            long likeCount = likeService.findEntityLikeCount(LIKE_TYPE_POST, post.getId());
+            postVo.put("likeCount",likeCount);
+            postVoList.add(postVo);
+        }
+        model.addAttribute("posts",postVoList);
+        return "/site/my-post";
+    }
+
     @RequestMapping(path = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title,String content){

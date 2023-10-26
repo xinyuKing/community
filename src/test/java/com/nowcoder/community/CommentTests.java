@@ -42,4 +42,18 @@ public class CommentTests {
         Comment comment = commentService.findCommentById(2);
         System.out.println(comment);
     }
+
+    @Test
+    public void testFindCommentsByUserId(){
+        List<Comment> comments = commentService.findCommentsByUserId(111, 0, 5);
+        for (Comment comment : comments) {
+            System.out.println(comment);
+        }
+    }
+
+    @Test
+    public void testFindCommentRowsByUserId(){
+        int rows = commentService.findCommentRowsByUserId(111);
+        System.out.println(rows);
+    }
 }

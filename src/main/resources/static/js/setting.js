@@ -1,6 +1,36 @@
 $(function(){
     $("#uploadForm").submit(upload);
+    $("#updatePassword").submit(updatePassword);
 });
+
+function showAlert(msg) {
+    alert(msg); // 显示Alert
+
+    setTimeout(function() {
+        close(); // 关闭当前窗口
+    }, 3000); // 3秒后执行关闭操作
+}
+
+function updatePassword() {
+    var oldPassword=$("#old-password").val();
+    var newPassword=$("#new-password").val();
+    $.post(
+        CONTEXT_PATH+"/user/setting/updatepassword",
+        {"oldPassword":oldPassword,"newPassword":newPassword},
+        function (data) {
+            data=$.parseJSON(data);
+            if(data.code==0){
+
+                showAlert("登录成功");
+                /*退出，重新登录*/
+                location.href=CONTEXT_PATH+"/logout";
+            }else{
+                showAlert(data.msg);
+            }
+        }
+    )
+}
+
 
 function upload() {
     $.ajax({
@@ -20,7 +50,7 @@ function upload() {
                         if (data.code==0){
                             window.location.reload();
                         }else{
-                            alert(data.msg)
+                            alert(data.msg);
                         }
                     }
                 )

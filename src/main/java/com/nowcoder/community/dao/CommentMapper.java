@@ -18,4 +18,10 @@ public interface CommentMapper {
 
     //根据id查询
     Comment selectCommentById(int id);
+
+    //查询用户所有的回帖和回复
+    List<Comment> selectCommentsByUserId(int userId,int offset,int limit);
+
+    //查询用户所有的回帖和回复的数量
+    int selectCommentRowsByUserId(int userId);
 }

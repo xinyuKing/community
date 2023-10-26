@@ -44,6 +44,11 @@ public class UserService implements CommunityConstant {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    //修改密码
+    public int updatePassword(int id,String password){
+        return userMapper.updatePassword(id, password);
+    }
+
     public User findUserById(int id){
         //优化后先从redis中查询
 //        return userMapper.selectById(id);
@@ -97,8 +102,20 @@ public class UserService implements CommunityConstant {
 //            if(u.getStatus()==1){
 //                map.put("emailMsg","邮箱已被注册！");
 //                return map;
-//            }else {//否则删除用户未激活的用户
-//                userMapper.deleteById(u.getId());
+//            }else {//再次发送邮件
+//                用户激活
+        //        //给用户发送激活邮件,用户通过前往邮件发送的网址进行激活
+        //        Context context=new Context();
+        //        context.setVariable("email",user.getEmail());
+        //        //http://localhost:8080/community/activation/101/code
+        //        String url=domain+contextPath+"/activation/"+user.getId()+"/"+user.getActivationCode();
+        //        context.setVariable("url",url);
+        //
+        //        String content = templateEngine.process("/mail/activation.html", context);
+        //
+        //        mailClient.sendMail(user.getEmail(),"激活账号",content);
+        //
+        //        return map;
 //            }
 //        }
 
